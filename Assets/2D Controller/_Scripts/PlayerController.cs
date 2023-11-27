@@ -12,7 +12,7 @@ using Cinemachine;
 
         #region Internal
         private PhotonView PV;
-        [HideInInspector] private Rigidbody2D _rb; // Hide is for serialization to avoid errors in gizmo calls
+        [HideInInspector] private Rigidbody2D _rb;
         [SerializeField] private CapsuleCollider2D _standingCollider;
         [SerializeField] private CapsuleCollider2D _crouchingCollider;
         private CapsuleCollider2D _col; // current active collider

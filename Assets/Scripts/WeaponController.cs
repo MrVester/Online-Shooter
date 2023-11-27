@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using Photon.Pun;
+using Photon.Realtime;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-public class WeaponController : MonoBehaviour
+
+public class WeaponController : MonoBehaviourPunCallbacks
 {
 
     public GameObject weaponHolder;
@@ -13,6 +15,9 @@ public class WeaponController : MonoBehaviour
     public Vector2 dropWeaponOffset;
     private IPlayerController _player;
     private PlayerInput _input;
+    private WeaponList _weaponList;
+    private HashController _hashController;
+
     private int flipVector;
     private string deviceName;
 
@@ -23,21 +28,29 @@ public class WeaponController : MonoBehaviour
 
     private void Awake()
     {
+        _weaponList = GetComponent<WeaponList>();
         _input = GetComponent<PlayerInput>();
-        PV = GetComponent<PhotonView>();
         _player = GetComponent<PlayerController>();
+        _hashController = GetComponent<HashController>();
+        PV = GetComponent<PhotonView>();
+        
     }
 
     private void Start()
     {
-        if (currentWeapon != null)
+        if (PV.IsMine)
+        {
+            int count = _weaponList.WeaponCount();
+            int randWeapon = Random.Range(0, count - 1);
+
+            //var instWeapon = Instantiate(_weaponList.GetWeaponByID(randWeapon));
+            EquipWeapon(randWeapon);
+        }
+      /*  if (currentWeapon != null)
         {
             currentWeapon.Equiped();
-        }
-        else
-        {
-            currentWeapon.Droped();
-        }
+        }*/
+
     }
     private void Update()
     {
@@ -88,39 +101,77 @@ public class WeaponController : MonoBehaviour
 
   
 
-    public void EquipWeapon(Weapon weapon)
+    public void EquipWeapon(int weaponID)
     {
-        if (currentWeapon!=null)
+        Weapon tmpWeapon= Instantiate(_weaponList.GetWeaponByID(weaponID));
+
+        if (currentWeapon!=null&&PV.IsMine)
         {
-            DropWeapon(currentWeapon);
+            DropWeapon(currentWeapon.ID);
         }
-        weapon.Equiped();
-        currentWeapon = weapon;
-        weapon.gameObject.transform.parent = weaponHolder.transform;
-        weapon.gameObject.transform.position = weaponHolder.transform.position;
-        weapon.gameObject.transform.localRotation = Quaternion.Euler(Vector3.zero);
-        weapon.gameObject.transform.localScale = Vector3.one;
+        tmpWeapon.Equiped();
+        currentWeapon = tmpWeapon;
+        tmpWeapon.gameObject.transform.parent = weaponHolder.transform;
+        tmpWeapon.gameObject.transform.position = weaponHolder.transform.position;
+        tmpWeapon.gameObject.transform.localRotation = Quaternion.Euler(Vector3.zero);
+        tmpWeapon.gameObject.transform.localScale = Vector3.one;
+        if (PV.IsMine)
+        {
+
+            _hashController.Add("equipWeaponID", weaponID);
+            PhotonNetwork.LocalPlayer.SetCustomProperties(_hashController.GetHash());
+        }
     }
 
     
-     public void DropWeapon(Weapon weapon)
+     public void DropWeapon(int weaponID)
      {
-        Weapon instantiatedWeapon = Instantiate(weapon, transform.position + new Vector3(dropWeaponOffset.x*flipVector, dropWeaponOffset.y,0), Quaternion.Euler(Vector3.zero));
-        instantiatedWeapon.Droped();
+        Weapon instantiatedWeapon = Instantiate(_weaponList.GetWeaponByID(weaponID), transform.position + new Vector3(dropWeaponOffset.x*flipVector, dropWeaponOffset.y,0), Quaternion.Euler(Vector3.zero));
+        instantiatedWeapon.Dropped();
         Destroy(currentWeapon.gameObject);
         currentWeapon = null;
-     }
+        if (PV.IsMine)
+        {
+            _hashController.Add("dropWeaponID", weaponID);
+            PhotonNetwork.LocalPlayer.SetCustomProperties(_hashController.GetHash());
+        }
+    }
 
-     public void OnCollisionEnter2D(Collision2D weapon)
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+    {
+        if (!PV.IsMine && targetPlayer == PV.Owner)
+        {
+            print("PlayerPropertiesUpdated");
+            if (changedProps.ContainsKey("equipWeaponID"))
+            {
+                print("ContainsKey(\"equipWeaponID\")");
+                EquipWeapon((int)changedProps["equipWeaponID"]);
+                _hashController.Remove("equipWeaponID");
+            }
+
+            if (changedProps.ContainsKey("dropWeaponID"))
+            {
+                print("ContainsKey(\"dropWeaponID\")");
+                DropWeapon((int)changedProps["dropWeaponID"]);
+                _hashController.Remove("dropWeaponID");
+            }
+
+        }
+
+    }
+
+    public void OnCollisionEnter2D(Collision2D weapon)
      {
         
          Weapon tmpWeapon;
          var isWeapon=weapon.gameObject.TryGetComponent(out tmpWeapon);
-        print("Entered collider, isWeapon: "+ isWeapon);
-        if (isWeapon)
+        //print("Entered collider, isWeapon: "+ isWeapon);
+        if (isWeapon&&PV.IsMine)
          {
-            print("Entered collider weapon");
-            EquipWeapon(tmpWeapon);
+           // print("Entered collider weapon");
+
+            EquipWeapon(tmpWeapon.ID);
+            PhotonNetwork.Destroy(weapon.gameObject);
          }
      }
 }

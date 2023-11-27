@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -6,13 +7,14 @@ using UnityEngine;
 [RequireComponent(typeof(CircleCollider2D),typeof(Rigidbody2D))]
 public class Weapon : MonoBehaviour,IWeapon
 {
-   
+    
     [field:SerializeField] public WeaponDataSO Data { get; private set; }
     //public GameObject weaponGO;
     private CircleCollider2D weaponCollider;
     private Rigidbody2D _rb;
     public int currentAmmo { get; private set; }
     public bool isDropped { get; private set; } = true;
+    public int ID; //Make id load from SO
 
     private void Awake()
     {
@@ -21,7 +23,7 @@ public class Weapon : MonoBehaviour,IWeapon
     }
 
 
-    public void Droped()
+    public void Dropped()
     {
         isDropped = true;
         weaponCollider.enabled = true;
@@ -55,7 +57,7 @@ public class Weapon : MonoBehaviour,IWeapon
 
 public interface IWeapon
 {
-    public void Droped();
+    public void Dropped();
     public void Equiped();
     public void Disolve();
     public bool isDropped { get; }
