@@ -15,9 +15,11 @@ public class Weapon : MonoBehaviour,IWeapon
     public int currentAmmo { get; private set; }
     public bool isDropped { get; private set; } = true;
     public int ID; //Make id load from SO
+    //public PhotonView PV;
 
     private void Awake()
     {
+       // PV=GetComponent<PhotonView>();
         weaponCollider = GetComponent<CircleCollider2D>();
         _rb = GetComponent<Rigidbody2D>();
     }
@@ -51,8 +53,11 @@ public class Weapon : MonoBehaviour,IWeapon
             //Disolve time = 10s
         }
     }
-
-  
+    [PunRPC]
+    public void DestroyRpc()
+    {
+        Destroy(gameObject);
+    }
 }
 
 public interface IWeapon

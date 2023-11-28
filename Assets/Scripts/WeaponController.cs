@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using System.IO;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 
@@ -11,7 +12,7 @@ public class WeaponController : MonoBehaviourPunCallbacks
 
     public GameObject weaponHolder;
     public GameObject hand;
-    [SerializeField]private Weapon currentWeapon;
+    [SerializeField] private Weapon currentWeapon;
     public Vector2 dropWeaponOffset;
     private IPlayerController _player;
     private PlayerInput _input;
@@ -33,7 +34,7 @@ public class WeaponController : MonoBehaviourPunCallbacks
         _player = GetComponent<PlayerController>();
         _hashController = GetComponent<HashController>();
         PV = GetComponent<PhotonView>();
-        
+
     }
 
     private void Start()
@@ -41,20 +42,23 @@ public class WeaponController : MonoBehaviourPunCallbacks
         if (PV.IsMine)
         {
             int count = _weaponList.WeaponCount();
-            int randWeapon = Random.Range(0, count - 1);
+           // int randWeapon = Random.Range(0, count - 1);
+            int randWeapon = 2;
 
+            if(PhotonNetwork.IsMasterClient)
+            PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "Weapon1") /*+ (randWeapon + 1))*/, new Vector3(2, 0, 0), Quaternion.identity);
             //var instWeapon = Instantiate(_weaponList.GetWeaponByID(randWeapon));
             EquipWeapon(randWeapon);
         }
-      /*  if (currentWeapon != null)
-        {
-            currentWeapon.Equiped();
-        }*/
+        /*  if (currentWeapon != null)
+          {
+              currentWeapon.Equiped();
+          }*/
 
     }
     private void Update()
     {
-        
+
         if (!PV.IsMine)
             return;
         isAttacked = _input.FrameInput.AttackDown;
@@ -69,14 +73,14 @@ public class WeaponController : MonoBehaviourPunCallbacks
         //follow coursor and gamepadstick axis
         float AngleRad;
 
-        
-            //For Mouse
-            Vector2 mouseScreenPosition = Camera.main.ScreenToWorldPoint(_player.Look);
-            var direction = (mouseScreenPosition - (Vector2)hand.transform.position).normalized;
-            AngleRad = Mathf.Atan2(direction.y, direction.x);
-      
-            //For gamepad
-            // AngleRad = Mathf.Atan2(_player.Look.y, _player.Look.x);
+
+        //For Mouse
+        Vector2 mouseScreenPosition = Camera.main.ScreenToWorldPoint(_player.Look);
+        var direction = (mouseScreenPosition - (Vector2)hand.transform.position).normalized;
+        AngleRad = Mathf.Atan2(direction.y, direction.x);
+
+        //For gamepad
+        // AngleRad = Mathf.Atan2(_player.Look.y, _player.Look.x);
 
         float angle = (180 / Mathf.PI) * AngleRad;
         hand.transform.rotation = Quaternion.Euler(0, 0, angle);
@@ -85,11 +89,11 @@ public class WeaponController : MonoBehaviourPunCallbacks
         //if >180 Z rotation then flip weapon
         var rotZ = hand.transform.eulerAngles.z - 180;
         var sc = hand.transform.localScale;
-        
+
         if (
-            ((Mathf.Abs(rotZ) < 90 && sc.y > 0) || (Mathf.Abs(rotZ) > 90 && sc.y < 0)) && (_player.FlipVector == 1|| _player.FlipVector == -1)
+            ((Mathf.Abs(rotZ) < 90 && sc.y > 0) || (Mathf.Abs(rotZ) > 90 && sc.y < 0)) && (_player.FlipVector == 1 || _player.FlipVector == -1)
             )
-            hand.transform.localScale = new Vector3(sc.x , sc.y * -1, sc.z);
+            hand.transform.localScale = new Vector3(sc.x, sc.y * -1, sc.z);
     }
 
     private void FlipHand()
@@ -99,16 +103,17 @@ public class WeaponController : MonoBehaviourPunCallbacks
             hand.transform.localPosition = new Vector3(pos.x * -1, pos.y, pos.z);
     }
 
-  
 
-    public void EquipWeapon(int weaponID)
+
+    public void EquipWeapon(int weaponID) //FIX NOT EQUIPPING WEAPON ON  !PV.IsMine CLIENT
     {
-        Weapon tmpWeapon= Instantiate(_weaponList.GetWeaponByID(weaponID));
-
-        if (currentWeapon!=null&&PV.IsMine)
+        if (currentWeapon != null && PV.IsMine)
         {
             DropWeapon(currentWeapon.ID);
         }
+
+        Weapon tmpWeapon = Instantiate(_weaponList.GetWeaponByID(weaponID));
+        
         tmpWeapon.Equiped();
         currentWeapon = tmpWeapon;
         tmpWeapon.gameObject.transform.parent = weaponHolder.transform;
@@ -123,11 +128,19 @@ public class WeaponController : MonoBehaviourPunCallbacks
         }
     }
 
-    
-     public void DropWeapon(int weaponID)
-     {
-        Weapon instantiatedWeapon = Instantiate(_weaponList.GetWeaponByID(weaponID), transform.position + new Vector3(dropWeaponOffset.x*flipVector, dropWeaponOffset.y,0), Quaternion.Euler(Vector3.zero));
-        instantiatedWeapon.Dropped();
+    [PunRPC]
+    public void EquipWeaponRpc()
+    {
+
+    }
+    public void DropWeapon(int weaponID)
+    {
+        if (PV.IsMine)
+        {
+            GameObject instantiatedWeapon = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "Weapon" + (weaponID + 1)), transform.position + new Vector3(dropWeaponOffset.x * flipVector, dropWeaponOffset.y, 0), Quaternion.Euler(Vector3.zero));
+            instantiatedWeapon.GetComponent<Weapon>().Dropped();
+        }
+           
         Destroy(currentWeapon.gameObject);
         currentWeapon = null;
         if (PV.IsMine)
@@ -161,17 +174,18 @@ public class WeaponController : MonoBehaviourPunCallbacks
     }
 
     public void OnCollisionEnter2D(Collision2D weapon)
-     {
-        
-         Weapon tmpWeapon;
-         var isWeapon=weapon.gameObject.TryGetComponent(out tmpWeapon);
+    {
+
+        Weapon tmpWeapon;
+        var isWeapon = weapon.gameObject.TryGetComponent(out tmpWeapon);
         //print("Entered collider, isWeapon: "+ isWeapon);
-        if (isWeapon&&PV.IsMine)
-         {
-           // print("Entered collider weapon");
+        if (isWeapon && PV.IsMine)
+        {
+            // print("Entered collider weapon");
 
             EquipWeapon(tmpWeapon.ID);
-            PhotonNetwork.Destroy(weapon.gameObject);
-         }
-     }
+            weapon.gameObject.GetComponent<PhotonView>().RPC("DestroyRpc", RpcTarget.All);
+            // PhotonNetwork.Destroy(weapon.gameObject);
+        }
+    }
 }
