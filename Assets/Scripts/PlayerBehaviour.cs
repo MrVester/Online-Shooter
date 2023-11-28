@@ -10,13 +10,11 @@ public class PlayerBehaviour : MonoBehaviourPunCallbacks
     private Vector3 playerVectorColor;
     private PhotonView PV;
     private SpriteRenderer playerRenderer;
-    private HashController _hashController;
 
     private void Awake()
     {
         PV = GetComponent<PhotonView>();
         playerRenderer = GetComponent<SpriteRenderer>();
-        _hashController = GetComponent<HashController>();
 
 
     }
@@ -29,9 +27,6 @@ public class PlayerBehaviour : MonoBehaviourPunCallbacks
         {
             SetPlayerColor(playerVectorColor);
         }
-        
-
-
     }
 
     public void SetPlayerColor(Vector3 playerColorToSet)
@@ -41,9 +36,9 @@ public class PlayerBehaviour : MonoBehaviourPunCallbacks
         if (PV.IsMine)
         {
 
-
-            _hashController.Add("playerColor", playerColorToSet);
-            PhotonNetwork.LocalPlayer.SetCustomProperties(_hashController.GetHash());
+            Hashtable hash = new Hashtable();
+            hash.Add("playerColor", playerColorToSet);
+            PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
         }
     }
 
@@ -54,7 +49,6 @@ public class PlayerBehaviour : MonoBehaviourPunCallbacks
             if (changedProps.ContainsKey("playerColor"))
             {
                 SetPlayerColor((Vector3)changedProps["playerColor"]);
-                _hashController.Remove("playerColor");
             }
         }
 

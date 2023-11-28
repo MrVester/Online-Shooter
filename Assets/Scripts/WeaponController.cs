@@ -6,18 +6,16 @@ using Photon.Realtime;
 using System.IO;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-
 public class WeaponController : MonoBehaviourPunCallbacks
 {
 
-    public GameObject weaponHolder;
-    public GameObject hand;
+    [SerializeField]private GameObject weaponHolder;
+    [SerializeField] private GameObject hand;
     [SerializeField] private Weapon currentWeapon;
     public Vector2 dropWeaponOffset;
     private IPlayerController _player;
     private PlayerInput _input;
     private WeaponList _weaponList;
-    private HashController _hashController;
 
     private int flipVector;
     private string deviceName;
@@ -32,7 +30,6 @@ public class WeaponController : MonoBehaviourPunCallbacks
         _weaponList = GetComponent<WeaponList>();
         _input = GetComponent<PlayerInput>();
         _player = GetComponent<PlayerController>();
-        _hashController = GetComponent<HashController>();
         PV = GetComponent<PhotonView>();
 
     }
@@ -42,12 +39,11 @@ public class WeaponController : MonoBehaviourPunCallbacks
         if (PV.IsMine)
         {
             int count = _weaponList.WeaponCount();
-           // int randWeapon = Random.Range(0, count - 1);
-            int randWeapon = 2;
+            int randWeapon = Random.Range(0, count - 1);
+            
 
             if(PhotonNetwork.IsMasterClient)
-            PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "Weapon1") /*+ (randWeapon + 1))*/, new Vector3(2, 0, 0), Quaternion.identity);
-            //var instWeapon = Instantiate(_weaponList.GetWeaponByID(randWeapon));
+            PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "Weapon" + (randWeapon + 1)), new Vector3(5, 0, 0), Quaternion.identity);
             EquipWeapon(randWeapon);
         }
         /*  if (currentWeapon != null)
@@ -105,11 +101,11 @@ public class WeaponController : MonoBehaviourPunCallbacks
 
 
 
-    public void EquipWeapon(int weaponID) //FIX NOT EQUIPPING WEAPON ON  !PV.IsMine CLIENT
+    public void EquipWeapon(int weaponID) 
     {
         if (currentWeapon != null && PV.IsMine)
         {
-            DropWeapon(currentWeapon.ID);
+            DropWeapon(currentWeapon.ID,dropWeaponOffset);
         }
 
         Weapon tmpWeapon = Instantiate(_weaponList.GetWeaponByID(weaponID));
@@ -122,9 +118,9 @@ public class WeaponController : MonoBehaviourPunCallbacks
         tmpWeapon.gameObject.transform.localScale = Vector3.one;
         if (PV.IsMine)
         {
-
-            _hashController.Add("equipWeaponID", weaponID);
-            PhotonNetwork.LocalPlayer.SetCustomProperties(_hashController.GetHash());
+            Hashtable hash = new Hashtable();
+            hash.Add("equipWeaponID", weaponID);
+            PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
         }
     }
 
@@ -133,7 +129,7 @@ public class WeaponController : MonoBehaviourPunCallbacks
     {
 
     }
-    public void DropWeapon(int weaponID)
+    public void DropWeapon(int weaponID, Vector2 dropWeaponOffset)
     {
         if (PV.IsMine)
         {
@@ -145,8 +141,9 @@ public class WeaponController : MonoBehaviourPunCallbacks
         currentWeapon = null;
         if (PV.IsMine)
         {
-            _hashController.Add("dropWeaponID", weaponID);
-            PhotonNetwork.LocalPlayer.SetCustomProperties(_hashController.GetHash());
+            Hashtable hash = new Hashtable();
+            hash.Add("dropWeaponID", weaponID);
+            PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
         }
     }
 
@@ -157,21 +154,28 @@ public class WeaponController : MonoBehaviourPunCallbacks
             print("PlayerPropertiesUpdated");
             if (changedProps.ContainsKey("equipWeaponID"))
             {
-                print("ContainsKey(\"equipWeaponID\")");
+                print("EQUIPED WEAPON WITH ID: "+ (int)changedProps["equipWeaponID"]);
                 EquipWeapon((int)changedProps["equipWeaponID"]);
-                _hashController.Remove("equipWeaponID");
+                //_hashController.Remove("equipWeaponID");
             }
 
             if (changedProps.ContainsKey("dropWeaponID"))
             {
-                print("ContainsKey(\"dropWeaponID\")");
-                DropWeapon((int)changedProps["dropWeaponID"]);
-                _hashController.Remove("dropWeaponID");
+                print("DROPPED WEAPON WITH ID: " + (int)changedProps["dropWeaponID"]);
+                DropWeapon((int)changedProps["dropWeaponID"],dropWeaponOffset);
+                //_hashController.Remove("dropWeaponID");
             }
 
         }
 
     }
+
+
+    /*public override void OnDisconnected(DisconnectCause cause)
+    {
+        base.OnDisconnected(cause);
+        Debug.LogWarning($"Player disconnected: {cause}");
+    }*/
 
     public void OnCollisionEnter2D(Collision2D weapon)
     {

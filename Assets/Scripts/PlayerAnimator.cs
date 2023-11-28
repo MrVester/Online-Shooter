@@ -1,16 +1,21 @@
+using Photon.Pun;
+using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
 using UnityEngine;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-
-public class PlayerAnimator : MonoBehaviour
+public class PlayerAnimator : MonoBehaviourPunCallbacks
 {
     private SpriteRenderer _renderer;
     private IPlayerController _player;
-    private int flipVector;
+    //private int flipVector;
+    private PhotonView PV;
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
+        PV= GetComponent<PhotonView>();
         _player = GetComponent<IPlayerController>();
         _renderer = GetComponent<SpriteRenderer>();
     }
@@ -18,11 +23,38 @@ public class PlayerAnimator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        HandleSpriteFlipping();
+        if (PV.IsMine)
+        {
+            HandleSpriteFlipping(_player.Input.x);
+        }
+        
     }
 
-    private void HandleSpriteFlipping()
+    private void HandleSpriteFlipping(float flipVector)
     {
-        if (Mathf.Abs(_player.Input.x) > 0.1f) _renderer.flipX = _player.Input.x < 0;
+        bool switched = Mathf.Abs(flipVector) > 0.1f;
+        if (switched)
+            _renderer.flipX = flipVector < 0;
+
+        if (PV.IsMine)
+        {
+
+            Hashtable hash = new Hashtable();
+            hash.Add("flipVector", flipVector);
+            PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
+        }
+    }
+
+
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+    {
+        if (!PV.IsMine && targetPlayer == PV.Owner)
+        {
+            if (changedProps.ContainsKey("flipVector"))
+            {
+                HandleSpriteFlipping((float)changedProps["flipVector"]);
+            }
+        }
+
     }
 }
