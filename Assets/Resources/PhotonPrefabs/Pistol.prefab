@@ -158,7 +158,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 3
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Color: {r: 0.07586646, g: 1, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -182,9 +182,9 @@ GameObject:
   - component: {fileID: 7180753898731180505}
   - component: {fileID: 1644001496149270973}
   - component: {fileID: 691894189381847687}
-  - component: {fileID: -3959337035092259074}
+  - component: {fileID: 8890642023928989290}
   m_Layer: 0
-  m_Name: Weapon1
+  m_Name: Pistol
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -219,8 +219,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d64ffd3ef1e153841a661a77b04f0c1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Data>k__BackingField: {fileID: 11400000, guid: 3a63e432f25b8e545803c83e07aaa893, type: 2}
-  ID: 0
+  <Data>k__BackingField: {fileID: 11400000, guid: 7d28361f6d6e3ad4e8f9d2504e47fde9, type: 2}
 --- !u!58 &7562842069730707178
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -322,7 +321,7 @@ MonoBehaviour:
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
   m_UseLocal: 1
---- !u!212 &-3959337035092259074
+--- !u!212 &8890642023928989290
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

@@ -12,19 +12,16 @@ public class WeaponList : MonoBehaviour
     private void Awake()
     {
         Sort();
-        /*foreach (var weapon in weapons)
-        {
-            sortedWeapons[weapon.ID]= weapon;
-        }
-        print("COUNT SORTED: " + sortedWeapons.Count);*/
     }
-    public Weapon GetWeaponByID(int ID)
+    public Weapon GetWeaponByName(string name)
     {
-        return sortedWeapons[ID];
+        int index= sortedWeapons.FindIndex(go => go.Data.name == name);
+        return sortedWeapons[index];
     }
+        
     public List<Weapon> GetList()
     {
-        return weapons;
+        return sortedWeapons;
     }
     public int WeaponCount()
     {
@@ -33,7 +30,7 @@ public class WeaponList : MonoBehaviour
     
     private void Sort()
     {
-        sortedWeapons =weapons.Distinct().OrderBy(x => x.ID).ToList();
+        sortedWeapons = weapons.Distinct().OrderBy(x => x.Data.name).ToList();
         //sortedWeapons = weapons.OrderBy(x => x.ID)
     }
 

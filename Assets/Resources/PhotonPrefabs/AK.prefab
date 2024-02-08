@@ -158,7 +158,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 3
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.07586646, g: 1, b: 0, a: 1}
+  m_Color: {r: 0, g: 0.021121979, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -184,7 +184,7 @@ GameObject:
   - component: {fileID: 691894189381847687}
   - component: {fileID: 8890642023928989290}
   m_Layer: 0
-  m_Name: Weapon3
+  m_Name: AK
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -219,8 +219,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d64ffd3ef1e153841a661a77b04f0c1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Data>k__BackingField: {fileID: 11400000, guid: 7d28361f6d6e3ad4e8f9d2504e47fde9, type: 2}
-  ID: 2
+  <Data>k__BackingField: {fileID: 11400000, guid: 3cbb242d5e0042a49b1fd6bf65fc2b21, type: 2}
 --- !u!58 &7562842069730707178
 CircleCollider2D:
   m_ObjectHideFlags: 0

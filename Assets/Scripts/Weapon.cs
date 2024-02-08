@@ -7,16 +7,15 @@ using UnityEngine;
 [RequireComponent(typeof(CircleCollider2D),typeof(Rigidbody2D),typeof(SpriteRenderer))]
 public class Weapon : MonoBehaviour,IWeapon
 {
-    
+    //Add bullet constructor for weapon
+    //Add bullet constructor for weapon
+    //Add bullet constructor for weapon
     [field:SerializeField] public WeaponDataSO Data { get; private set; }
-    //public GameObject weaponGO;
     private CircleCollider2D weaponCollider;
     private Rigidbody2D _rb;
     public int currentAmmo { get; private set; }
     public bool isDropped { get; private set; } = true;
-    public int ID;
     private SpriteRenderer _spriteRenderer;
-    //Make id load from SO
     private PhotonView PV;
 
     private void Awake()
@@ -70,10 +69,10 @@ public class Weapon : MonoBehaviour,IWeapon
 }
 
 public interface IWeapon
-{
+{   public WeaponDataSO Data{ get; }
+    public bool isDropped { get; }
     public void Dropped();
     public void Equiped();
     public void Disolve();
-    public bool isDropped { get; }
     public void Shoot();
 }

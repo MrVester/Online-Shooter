@@ -36,16 +36,20 @@ public class WeaponController : MonoBehaviourPunCallbacks
 
     private void Start()
     {
+        //Now i am instantiating objects by Data.name from photon resources and to get weapons with
+        //changed properties (in game etc. bullets amount) is it necessary to just sync that properties?
+        //The problem is i have to name resources the same name in WeaponSO
         if (PV.IsMine)
         {
-            int count = _weaponList.WeaponCount();
-            int randWeapon = Random.Range(0, count - 1);
-            
+            int weaponCount = _weaponList.WeaponCount();
+            int randWeapon = Random.Range(0, weaponCount - 1);
 
-            if(PhotonNetwork.IsMasterClient)
-            PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "Weapon" + (randWeapon + 1)), new Vector3(5, 0, 0), Quaternion.identity);
-            //PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", _weaponList.GetList()[Random.Range(0, count)].name), new Vector3(5, 0, 0), Quaternion.identity);
-            EquipWeapon(randWeapon);
+            //Spawn 1 rand weapon for test
+            if (PhotonNetwork.IsMasterClient)
+            PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", _weaponList.GetList()[randWeapon].Data.name), new Vector3(5, 0, 0), Quaternion.identity);
+            
+            //Equip 1 rand weapon per player for test
+            EquipWeapon(_weaponList.GetList()[randWeapon].Data.name);
         }
         /*  if (currentWeapon != null)
           {
@@ -102,14 +106,14 @@ public class WeaponController : MonoBehaviourPunCallbacks
 
 
 
-    public void EquipWeapon(int weaponID) 
+    public void EquipWeapon(string weaponName) 
     {
         if (currentWeapon != null && PV.IsMine)
         {
-            DropWeapon(currentWeapon.ID,dropWeaponOffset);
+            DropWeapon(currentWeapon.Data.name,dropWeaponOffset);
         }
 
-        Weapon tmpWeapon = Instantiate(_weaponList.GetWeaponByID(weaponID));
+        Weapon tmpWeapon = Instantiate(_weaponList.GetWeaponByName(weaponName));
         
         tmpWeapon.Equiped();
         currentWeapon = tmpWeapon;
@@ -120,7 +124,7 @@ public class WeaponController : MonoBehaviourPunCallbacks
         if (PV.IsMine)
         {
             Hashtable hash = new Hashtable();
-            hash.Add("equipWeaponID", weaponID);
+            hash.Add("equipWeaponNAME", weaponName);
             PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
         }
     }
@@ -130,11 +134,15 @@ public class WeaponController : MonoBehaviourPunCallbacks
     {
 
     }
-    public void DropWeapon(int weaponID, Vector2 dropWeaponOffset)
+    public void DropWeapon(string weaponName, Vector2 dropWeaponOffset)
     {
         if (PV.IsMine)
         {
-            GameObject instantiatedWeapon = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "Weapon" + (weaponID + 1)), transform.position + new Vector3(dropWeaponOffset.x * flipVector, dropWeaponOffset.y, 0), Quaternion.Euler(Vector3.zero));
+            int weaponIndexbbyName = _weaponList.GetList().FindIndex(go => go.Data.name == weaponName);
+            //Add bullet constructor for weapon
+           
+
+            GameObject instantiatedWeapon = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", weaponName), transform.position + new Vector3(dropWeaponOffset.x * flipVector, dropWeaponOffset.y, 0), Quaternion.Euler(Vector3.zero));
             instantiatedWeapon.GetComponent<Weapon>().Dropped();
         }
            
@@ -143,7 +151,7 @@ public class WeaponController : MonoBehaviourPunCallbacks
         if (PV.IsMine)
         {
             Hashtable hash = new Hashtable();
-            hash.Add("dropWeaponID", weaponID);
+            hash.Add("dropWeaponNAME", weaponName);
             PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
         }
     }
@@ -152,19 +160,17 @@ public class WeaponController : MonoBehaviourPunCallbacks
     {
         if (!PV.IsMine && targetPlayer == PV.Owner)
         {
-            print("PlayerPropertiesUpdated");
-            if (changedProps.ContainsKey("equipWeaponID"))
+           // print("PlayerPropertiesUpdated");
+            if (changedProps.ContainsKey("equipWeaponNAME"))
             {
-                print("EQUIPED WEAPON WITH ID: "+ (int)changedProps["equipWeaponID"]);
-                EquipWeapon((int)changedProps["equipWeaponID"]);
-                //_hashController.Remove("equipWeaponID");
+                //print("EQUIPED WEAPON WITH ID: "+ (int)changedProps["equipWeaponID"]);
+                EquipWeapon((string)changedProps["equipWeaponNAME"]);
             }
 
-            if (changedProps.ContainsKey("dropWeaponID"))
+            if (changedProps.ContainsKey("dropWeaponNAME"))
             {
-                print("DROPPED WEAPON WITH ID: " + (int)changedProps["dropWeaponID"]);
-                DropWeapon((int)changedProps["dropWeaponID"],dropWeaponOffset);
-                //_hashController.Remove("dropWeaponID");
+                //print("DROPPED WEAPON WITH ID: " + (int)changedProps["dropWeaponID"]);
+                DropWeapon((string)changedProps["dropWeaponNAME"],dropWeaponOffset);
             }
 
         }
@@ -188,7 +194,7 @@ public class WeaponController : MonoBehaviourPunCallbacks
         {
             // print("Entered collider weapon");
 
-            EquipWeapon(tmpWeapon.ID);
+            EquipWeapon(tmpWeapon.Data.name);
             weapon.gameObject.GetComponent<PhotonView>().RPC("DestroyRpc", RpcTarget.All);
             // PhotonNetwork.Destroy(weapon.gameObject);
         }
