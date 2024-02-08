@@ -308,7 +308,6 @@ MonoBehaviour:
   - {fileID: 9157078843255473249, guid: 715deebc4d14cb841bc2d7deff94c30f, type: 3}
   - {fileID: 9157078843255473249, guid: f6c3995b7b9db064db2ee76b4eee0365, type: 3}
   - {fileID: 9157078843255473249, guid: f2269ac327ff55c41b70348006bebaf0, type: 3}
-  - {fileID: 9157078843255473249, guid: 715deebc4d14cb841bc2d7deff94c30f, type: 3}
   sortedWeapons: []
 --- !u!114 &-8068305993664734675
 MonoBehaviour:

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-[RequireComponent(typeof(CircleCollider2D),typeof(Rigidbody2D))]
+[RequireComponent(typeof(CircleCollider2D),typeof(Rigidbody2D),typeof(SpriteRenderer))]
 public class Weapon : MonoBehaviour,IWeapon
 {
     
@@ -14,12 +14,17 @@ public class Weapon : MonoBehaviour,IWeapon
     private Rigidbody2D _rb;
     public int currentAmmo { get; private set; }
     public bool isDropped { get; private set; } = true;
-    public int ID; //Make id load from SO
-    //public PhotonView PV;
+    public int ID;
+    private SpriteRenderer _spriteRenderer;
+    //Make id load from SO
+    private PhotonView PV;
 
     private void Awake()
     {
-       // PV=GetComponent<PhotonView>();
+         PV=GetComponent<PhotonView>();
+        _spriteRenderer=GetComponent<SpriteRenderer>();
+        _spriteRenderer.sprite = Data.sprite;
+        _spriteRenderer.sortingOrder = 1;
         weaponCollider = GetComponent<CircleCollider2D>();
         _rb = GetComponent<Rigidbody2D>();
     }
@@ -53,6 +58,10 @@ public class Weapon : MonoBehaviour,IWeapon
             //Disolve time = 10s
         }
     }
+    public void Shoot()
+    {
+
+    }
     [PunRPC]
     public void DestroyRpc()
     {
@@ -66,4 +75,5 @@ public interface IWeapon
     public void Equiped();
     public void Disolve();
     public bool isDropped { get; }
+    public void Shoot();
 }

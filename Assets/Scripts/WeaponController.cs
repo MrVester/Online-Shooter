@@ -44,6 +44,7 @@ public class WeaponController : MonoBehaviourPunCallbacks
 
             if(PhotonNetwork.IsMasterClient)
             PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "Weapon" + (randWeapon + 1)), new Vector3(5, 0, 0), Quaternion.identity);
+            //PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", _weaponList.GetList()[Random.Range(0, count)].name), new Vector3(5, 0, 0), Quaternion.identity);
             EquipWeapon(randWeapon);
         }
         /*  if (currentWeapon != null)

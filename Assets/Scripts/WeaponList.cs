@@ -22,7 +22,10 @@ public class WeaponList : MonoBehaviour
     {
         return sortedWeapons[ID];
     }
-
+    public List<Weapon> GetList()
+    {
+        return weapons;
+    }
     public int WeaponCount()
     {
         return sortedWeapons.Count;
