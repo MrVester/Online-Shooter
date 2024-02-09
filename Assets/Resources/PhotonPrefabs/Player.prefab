@@ -290,7 +290,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponHolder: {fileID: 2443638623387435041}
   hand: {fileID: 2503360951994656052}
-  currentWeapon: {fileID: 0}
   dropWeaponOffset: {x: 3, y: 2}
 --- !u!114 &3793893064376155940
 MonoBehaviour:
@@ -305,7 +304,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weapons:
-  - {fileID: 9157078843255473249, guid: 715deebc4d14cb841bc2d7deff94c30f, type: 3}
   - {fileID: 9157078843255473249, guid: f6c3995b7b9db064db2ee76b4eee0365, type: 3}
   - {fileID: 9157078843255473249, guid: f2269ac327ff55c41b70348006bebaf0, type: 3}
   sortedWeapons: []

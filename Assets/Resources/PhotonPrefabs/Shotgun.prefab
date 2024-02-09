@@ -183,7 +183,7 @@ GameObject:
   - component: {fileID: 1644001496149270973}
   - component: {fileID: 691894189381847687}
   - component: {fileID: -3959337035092259074}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Shotgun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -220,7 +220,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <Data>k__BackingField: {fileID: 11400000, guid: 3a63e432f25b8e545803c83e07aaa893, type: 2}
-  ID: 0
 --- !u!58 &7562842069730707178
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -253,7 +252,7 @@ CircleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.00000047683716}
+  m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
 --- !u!50 &7180753898731180505

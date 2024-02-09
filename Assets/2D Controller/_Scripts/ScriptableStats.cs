@@ -3,6 +3,9 @@ using UnityEngine;
 
     [CreateAssetMenu]
     public class ScriptableStats : ScriptableObject {
+        [Header("HEALTH")]
+        public float maxHealth;
+
         [Header("LAYERS")]
         [Tooltip("Set this to the layer your player is on")]
         public LayerMask PlayerLayer;

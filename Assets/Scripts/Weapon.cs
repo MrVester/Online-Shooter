@@ -28,6 +28,10 @@ public class Weapon : MonoBehaviour,IWeapon
         _rb = GetComponent<Rigidbody2D>();
     }
 
+    private void Update()
+    {
+       
+    }
 
     public void Dropped()
     {
@@ -57,10 +61,6 @@ public class Weapon : MonoBehaviour,IWeapon
             //Disolve time = 10s
         }
     }
-    public void Shoot()
-    {
-
-    }
     [PunRPC]
     public void DestroyRpc()
     {
@@ -70,9 +70,10 @@ public class Weapon : MonoBehaviour,IWeapon
 
 public interface IWeapon
 {   public WeaponDataSO Data{ get; }
+   
     public bool isDropped { get; }
     public void Dropped();
     public void Equiped();
     public void Disolve();
-    public void Shoot();
+
 }

@@ -183,7 +183,7 @@ GameObject:
   - component: {fileID: 1644001496149270973}
   - component: {fileID: 691894189381847687}
   - component: {fileID: 8890642023928989290}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: AK
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -252,7 +252,7 @@ CircleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.00000047683716}
+  m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
 --- !u!50 &7180753898731180505

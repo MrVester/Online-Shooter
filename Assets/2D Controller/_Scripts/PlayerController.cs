@@ -1,5 +1,3 @@
-// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
-
 using System;
 using UnityEngine;
 using Photon.Pun;
@@ -7,7 +5,7 @@ using Cinemachine;
 
 
     [RequireComponent(typeof(Collider2D))]
-    public class PlayerController : MonoBehaviour, IPlayerController {
+    public class PlayerController : MonoBehaviour, IPlayerController, IDamageable {
         [SerializeField] private ScriptableStats _stats;
 
         #region Internal
@@ -17,6 +15,7 @@ using Cinemachine;
         [SerializeField] private CapsuleCollider2D _crouchingCollider;
         private CapsuleCollider2D _col; // current active collider
         private PlayerInput _input;
+        private WeaponController _weaponController;
         private bool _cachedTriggerSetting;
 
         protected FrameInput FrameInput;
@@ -25,6 +24,11 @@ using Cinemachine;
         private int _fixedFrame;
         private bool _hasControl = true;
         private int _flipVector = 1;
+        private bool _attacks = false;
+
+        private float maxHealth=1;
+        private float currentHealth;
+        PlayerManager playerManager;
         #endregion
 
         #region External
@@ -72,29 +76,59 @@ using Cinemachine;
         #endregion
 
         protected virtual void Awake() {
+           
+            maxHealth = _stats.maxHealth;
+            currentHealth = maxHealth;
             PV = GetComponent<PhotonView>();
+            _weaponController = GetComponent<WeaponController>();
             _rb = GetComponent<Rigidbody2D>();
             _input = GetComponent<PlayerInput>();
             _cachedTriggerSetting = Physics2D.queriesHitTriggers;
             Physics2D.queriesStartInColliders = false;
-
+            
             ToggleColliders(isStanding: true);
         }
         private void Start()
         {
+            playerManager = PhotonView.Find((int)PV.InstantiationData[0]).GetComponent<PlayerManager>();
             if (!PV.IsMine)
             {
                 Destroy(GetComponentInChildren<CinemachineVirtualCamera>().gameObject);
-            //Destroy(_rb);
-                _rb.simulated = false;
+               
+                //_rb.simulated = true;
             }
         }
         protected virtual void Update() {
-            if (!PV.IsMine)
+        if (!PV.IsMine)
                 return;
+       
+            GatherAttackWeapon();
             GatherInput();
             SetFlipVector();
  
+        }
+        public void TakeDamage(float damage)
+        {
+            PV.RPC("RPC_TakeDamage", RpcTarget.All, damage);
+        }
+
+        [PunRPC]
+        void RPC_TakeDamage(float damage)
+        {
+            if (!PV.IsMine)
+            return;
+
+        currentHealth -= damage;
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+            print("Took damage: "+ damage);
+            print("Health: "+ currentHealth);
+        }
+        void Die()
+        {
+            playerManager.Die();
         }
         private void SetFlipVector()
         {
@@ -103,6 +137,29 @@ using Cinemachine;
 
         }
 
+        protected virtual void GatherAttackWeapon()
+        {
+           /*print("Current attackHold: " + _input.FrameInput.AttackHold);
+           print("Current attackDown: " + _input.FrameInput.AttackDown);
+           print("Current _attacks: " + _attacks);*/
+
+           if (_input.FrameInput.AttackReleased && _attacks)
+           {
+               _attacks = false;
+           }
+
+           if ((_input.FrameInput.AttackHold || _input.FrameInput.AttackDown) && !_attacks)
+           {
+               _attacks = true;
+           }
+           if (_attacks)
+           {
+
+            _weaponController.Shoot(_weaponController.equippedWeapon);
+
+           }
+              
+        }
 
         protected virtual void GatherInput() {
             FrameInput = _input.FrameInput;
@@ -554,7 +611,9 @@ using Cinemachine;
                 _frameLastAttacked = _fixedFrame;
                 Attacked?.Invoke();
             }
-
+          
+            
+       
             _attackToConsume = false;
         }
 

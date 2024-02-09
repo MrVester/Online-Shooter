@@ -12,12 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10b823639e543694d890e5f8a77be1af, type: 3}
   m_Name: Default Stats
   m_EditorClassIdentifier: 
+  maxHealth: 0
   PlayerLayer:
     serializedVersion: 2
     m_Bits: 64
   ClimbableLayer:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 1024
   LadderLayer:
     serializedVersion: 2
     m_Bits: 256

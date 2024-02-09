@@ -8,6 +8,7 @@ public class WeaponDataSO : ScriptableObject
     public Sprite sprite;
     public new string name;
     public int ammo;
+    public float damage;
     public int bulletsPerShot;
     public int spreadAngle;
     public float shootingSpeed;

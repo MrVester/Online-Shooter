@@ -5,23 +5,25 @@ using Photon.Pun;
 using Photon.Realtime;
 using System.IO;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
+using Unity.PlasticSCM.Editor.WebApi;
 
-public class WeaponController : MonoBehaviourPunCallbacks
+public class WeaponController : MonoBehaviourPunCallbacks, IWeaponController
 {
 
     [SerializeField]private GameObject weaponHolder;
     [SerializeField] private GameObject hand;
-    [SerializeField] private Weapon currentWeapon;
+    [SerializeField] public Weapon equippedWeapon { get; set; }
     public Vector2 dropWeaponOffset;
     private IPlayerController _player;
     private PlayerInput _input;
     private WeaponList _weaponList;
-
     private int flipVector;
     private string deviceName;
 
+
     private bool isAttacked;
 
+    private float cooldownTimestamp=0;
 
     private PhotonView PV;
 
@@ -33,28 +35,35 @@ public class WeaponController : MonoBehaviourPunCallbacks
         PV = GetComponent<PhotonView>();
 
     }
-
+    /*private void SetGameLayerRecursive(GameObject gameObject, int layer)
+    {
+        gameObject.layer = layer;
+        foreach (Transform child in gameObject.transform)
+        {
+            SetGameLayerRecursive(child.gameObject, layer);
+        }
+    }*/
     private void Start()
     {
         //Now i am instantiating objects by Data.name from photon resources and to get weapons with
         //changed properties (in game etc. bullets amount) is it necessary to just sync that properties?
         //The problem is i have to name resources the same name in WeaponSO
+        
         if (PV.IsMine)
         {
+            
             int weaponCount = _weaponList.WeaponCount();
-            int randWeapon = Random.Range(0, weaponCount - 1);
+            int randWeapon = Random.Range(0, weaponCount);
 
             //Spawn 1 rand weapon for test
+
             if (PhotonNetwork.IsMasterClient)
             PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", _weaponList.GetList()[randWeapon].Data.name), new Vector3(5, 0, 0), Quaternion.identity);
             
             //Equip 1 rand weapon per player for test
             EquipWeapon(_weaponList.GetList()[randWeapon].Data.name);
         }
-        /*  if (currentWeapon != null)
-          {
-              currentWeapon.Equiped();
-          }*/
+       
 
     }
     private void Update()
@@ -67,8 +76,33 @@ public class WeaponController : MonoBehaviourPunCallbacks
         flipVector = _player.FlipVector; //print(deviceName);
         HandRotation();
         FlipHand();
+
+       
+
+    }
+    bool TryShoot(IWeapon weapon)
+    {
+        if (Time.time < cooldownTimestamp) return false;
+        cooldownTimestamp = Time.time + (weapon.Data.shootingSpeed / 10);
+        return true;
     }
 
+    public void Shoot(IWeapon weapon)
+    {
+        Vector2 mouseScreenPosition = Camera.main.ScreenToWorldPoint(_player.Look);
+        var direction = (mouseScreenPosition - (Vector2)hand.transform.position).normalized;
+        Ray2D ray = new Ray2D(hand.transform.position , direction);
+        RaycastHit2D hit;
+       
+        Debug.DrawRay(ray.origin, ray.direction,Color.red);
+        if (TryShoot(weapon)&&(hit=Physics2D.Raycast(ray.origin , ray.direction)))
+        {   
+            hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(weapon.Data.damage);
+            print("We hit "+ hit.collider.gameObject.name);
+            print("Shooting " + weapon.Data.name);
+        }
+       
+    }
     private void HandRotation()
     {
         //follow coursor and gamepadstick axis
@@ -108,15 +142,15 @@ public class WeaponController : MonoBehaviourPunCallbacks
 
     public void EquipWeapon(string weaponName) 
     {
-        if (currentWeapon != null && PV.IsMine)
+        if (equippedWeapon != null && PV.IsMine)
         {
-            DropWeapon(currentWeapon.Data.name,dropWeaponOffset);
+            DropWeapon(equippedWeapon.Data.name,dropWeaponOffset);
         }
 
         Weapon tmpWeapon = Instantiate(_weaponList.GetWeaponByName(weaponName));
         
         tmpWeapon.Equiped();
-        currentWeapon = tmpWeapon;
+        equippedWeapon = tmpWeapon;
         tmpWeapon.gameObject.transform.parent = weaponHolder.transform;
         tmpWeapon.gameObject.transform.position = weaponHolder.transform.position;
         tmpWeapon.gameObject.transform.localRotation = Quaternion.Euler(Vector3.zero);
@@ -129,13 +163,15 @@ public class WeaponController : MonoBehaviourPunCallbacks
         }
     }
 
-    [PunRPC]
+  /*  [PunRPC]
     public void EquipWeaponRpc()
     {
 
-    }
+    }*/
     public void DropWeapon(string weaponName, Vector2 dropWeaponOffset)
     {
+        if (equippedWeapon == null)
+            return;
         if (PV.IsMine)
         {
             int weaponIndexbbyName = _weaponList.GetList().FindIndex(go => go.Data.name == weaponName);
@@ -146,8 +182,8 @@ public class WeaponController : MonoBehaviourPunCallbacks
             instantiatedWeapon.GetComponent<Weapon>().Dropped();
         }
            
-        Destroy(currentWeapon.gameObject);
-        currentWeapon = null;
+        Destroy(equippedWeapon.gameObject);
+        equippedWeapon = null;
         if (PV.IsMine)
         {
             Hashtable hash = new Hashtable();
@@ -199,4 +235,10 @@ public class WeaponController : MonoBehaviourPunCallbacks
             // PhotonNetwork.Destroy(weapon.gameObject);
         }
     }
+
+}
+public interface IWeaponController
+{   public Weapon equippedWeapon { get; set; }
+    public void Shoot(IWeapon weapon);
+
 }
