@@ -63,7 +63,7 @@ public class Weapon : MonoBehaviour,IWeapon
         }
     }
     [PunRPC]
-    public void DestroyRpc()
+    public void RPC_Destroy()
     {
         Destroy(gameObject);
     }

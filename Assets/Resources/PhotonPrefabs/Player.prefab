@@ -165,7 +165,6 @@ GameObject:
   - component: {fileID: 1680971640666636127}
   - component: {fileID: 7164316542878838919}
   - component: {fileID: 2327884516554075594}
-  - component: {fileID: 3793893064376155940}
   - component: {fileID: -8068305993664734675}
   - component: {fileID: 3695863988174357446}
   - component: {fileID: 4340542451396165652}
@@ -291,22 +290,6 @@ MonoBehaviour:
   weaponHolder: {fileID: 2443638623387435041}
   hand: {fileID: 2503360951994656052}
   dropWeaponOffset: {x: 3, y: 2}
---- !u!114 &3793893064376155940
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4075962830016256845}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c251b76e0ac37a149b4c600689c97562, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  weapons:
-  - {fileID: 9157078843255473249, guid: f6c3995b7b9db064db2ee76b4eee0365, type: 3}
-  - {fileID: 9157078843255473249, guid: f2269ac327ff55c41b70348006bebaf0, type: 3}
-  sortedWeapons: []
 --- !u!114 &-8068305993664734675
 MonoBehaviour:
   m_ObjectHideFlags: 0

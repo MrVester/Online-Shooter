@@ -3,11 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class WeaponList : MonoBehaviour
 {
     [SerializeField] private List<Weapon> weapons;
-    [SerializeField] private List<Weapon> sortedWeapons;
+    private List<Weapon> sortedWeapons;
 
     private void Awake()
     {
@@ -16,6 +17,8 @@ public class WeaponList : MonoBehaviour
     public Weapon GetWeaponByName(string name)
     {
         int index= sortedWeapons.FindIndex(go => go.Data.name == name);
+        if (index < 0)
+            return null;
         return sortedWeapons[index];
     }
         
@@ -28,6 +31,12 @@ public class WeaponList : MonoBehaviour
         return sortedWeapons.Count;
     }
     
+    public string RandomWeaponName()
+    {
+        int weaponCount = WeaponCount();
+        int randWeapon = Random.Range(0, weaponCount);
+        return sortedWeapons[randWeapon].Data.name;
+    }
     private void Sort()
     {
         sortedWeapons = weapons.Distinct().OrderBy(x => x.Data.name).ToList();
