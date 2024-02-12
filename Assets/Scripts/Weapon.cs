@@ -6,15 +6,16 @@ using UnityEngine;
 
 [RequireComponent(typeof(CircleCollider2D),typeof(Rigidbody2D),typeof(SpriteRenderer))]
 public class Weapon : MonoBehaviour,IWeapon
-{
+{   
     //Add bullet constructor for weapon
     //Add bullet constructor for weapon
     //Add bullet constructor for weapon
+    public int currentAmmo { get; private set; }
+    public bool isDropped { get; private set; } = true;
+   
     [field:SerializeField] public WeaponDataSO Data { get; private set; }
     private CircleCollider2D weaponCollider;
     private Rigidbody2D _rb;
-    public int currentAmmo { get; private set; }
-    public bool isDropped { get; private set; } = true;
     private SpriteRenderer _spriteRenderer;
     private PhotonView PV;
 

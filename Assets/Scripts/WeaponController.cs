@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random= UnityEngine.Random;
 using Photon.Pun;
 using Photon.Realtime;
 using System.IO;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
-using Unity.PlasticSCM.Editor.WebApi;
+
 
 public class WeaponController : MonoBehaviourPunCallbacks, IWeaponController
 {
@@ -51,17 +52,17 @@ public class WeaponController : MonoBehaviourPunCallbacks, IWeaponController
         
         if (PV.IsMine)
         {
-            
+            Weapon weaponToSpawn1, weaponToSpawn2;
             int weaponCount = _weaponList.WeaponCount();
             int randWeapon = Random.Range(0, weaponCount);
 
             //Spawn 1 rand weapon for test
-
             if (PhotonNetwork.IsMasterClient)
-            PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", _weaponList.GetList()[randWeapon].Data.name), new Vector3(5, 0, 0), Quaternion.identity);
-            
+                weaponToSpawn1 =SpawnWeapon<Weapon>(_weaponList.GetList()[randWeapon].Data.name, new Vector3(5, 0, 0));
+            randWeapon = Random.Range(0, weaponCount);
+            weaponToSpawn2 = SpawnWeapon<Weapon>(_weaponList.GetList()[randWeapon].Data.name, Vector3.zero);
             //Equip 1 rand weapon per player for test
-            EquipWeapon(_weaponList.GetList()[randWeapon].Data.name);
+            EquipWeapon(weaponToSpawn2);
         }
        
 
@@ -80,6 +81,17 @@ public class WeaponController : MonoBehaviourPunCallbacks, IWeaponController
        
 
     }
+    public T SpawnWeapon<T>(string weapon, Vector3 coords)
+    {
+        T genericObj;
+        GameObject weaponObj = new GameObject();
+       
+            weaponObj= PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", weapon ), coords, Quaternion.identity, 0, new object[] { PV.ViewID });
+       
+            weaponObj.TryGetComponent<T>(out genericObj);
+        return genericObj;
+    }
+
     bool TryShoot(IWeapon weapon)
     {
         if (Time.time < cooldownTimestamp) return false;
@@ -139,80 +151,53 @@ public class WeaponController : MonoBehaviourPunCallbacks, IWeaponController
     }
 
 
-
-    public void EquipWeapon(string weaponName) 
+    public void EquipWeapon(Weapon weapon)
+    {
+        int id = weapon.GetComponent<PhotonView>().ViewID;
+        PV.RPC("RPC_EquipWeapon", RpcTarget.All, id);
+    }
+        [PunRPC]
+    public void RPC_EquipWeapon(int weaponid)
     {
         if (equippedWeapon != null && PV.IsMine)
         {
-            DropWeapon(equippedWeapon.Data.name,dropWeaponOffset);
+            DropWeapon(equippedWeapon, dropWeaponOffset);
         }
-
-        Weapon tmpWeapon = Instantiate(_weaponList.GetWeaponByName(weaponName));
+        Weapon weapon = PhotonView.Find(weaponid).GetComponent<Weapon>();
         
-        tmpWeapon.Equiped();
-        equippedWeapon = tmpWeapon;
-        tmpWeapon.gameObject.transform.parent = weaponHolder.transform;
-        tmpWeapon.gameObject.transform.position = weaponHolder.transform.position;
-        tmpWeapon.gameObject.transform.localRotation = Quaternion.Euler(Vector3.zero);
-        tmpWeapon.gameObject.transform.localScale = Vector3.one;
-        if (PV.IsMine)
-        {
-            Hashtable hash = new Hashtable();
-            hash.Add("equipWeaponNAME", weaponName);
-            PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
-        }
+        weapon.Equiped();
+        equippedWeapon = weapon;
+        weapon.transform.parent = weaponHolder.transform;
+        weapon.transform.position = weaponHolder.transform.position;
+        weapon.transform.localRotation = Quaternion.Euler(Vector3.zero);
+        weapon.transform.localScale = Vector3.one;
+        
     }
 
-  /*  [PunRPC]
-    public void EquipWeaponRpc()
+    public void DropWeapon(Weapon weapon,Vector2 dropWeaponOffset)
     {
+        int id = weapon.GetComponent<PhotonView>().ViewID;
+        PV.RPC("RPC_DropWeapon", RpcTarget.All, id, dropWeaponOffset);
+    }
+    [PunRPC]
+    public void RPC_DropWeapon(int weaponid, Vector2 dropWeaponOffset)
+    {
+        Weapon weapon;
+        Vector3 offsetCoords = transform.position + new Vector3(dropWeaponOffset.x * flipVector, dropWeaponOffset.y, 0);
 
-    }*/
-    public void DropWeapon(string weaponName, Vector2 dropWeaponOffset)
-    {
         if (equippedWeapon == null)
             return;
-        if (PV.IsMine)
-        {
-            int weaponIndexbbyName = _weaponList.GetList().FindIndex(go => go.Data.name == weaponName);
-            //Add bullet constructor for weapon
-           
 
-            GameObject instantiatedWeapon = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", weaponName), transform.position + new Vector3(dropWeaponOffset.x * flipVector, dropWeaponOffset.y, 0), Quaternion.Euler(Vector3.zero));
-            instantiatedWeapon.GetComponent<Weapon>().Dropped();
-        }
-           
-        Destroy(equippedWeapon.gameObject);
+        PhotonView.Find(weaponid).TryGetComponent(out weapon);
+
+        weapon.transform.parent = null;
+        weapon.transform.position = offsetCoords;
+        weapon.transform.localRotation = Quaternion.Euler(Vector3.zero);
+        weapon.transform.localScale = Vector3.one;  
+        weapon.Dropped();
         equippedWeapon = null;
-        if (PV.IsMine)
-        {
-            Hashtable hash = new Hashtable();
-            hash.Add("dropWeaponNAME", weaponName);
-            PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
-        }
+        
     }
-
-    public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
-    {
-        if (!PV.IsMine && targetPlayer == PV.Owner)
-        {
-           // print("PlayerPropertiesUpdated");
-            if (changedProps.ContainsKey("equipWeaponNAME"))
-            {
-                //print("EQUIPED WEAPON WITH ID: "+ (int)changedProps["equipWeaponID"]);
-                EquipWeapon((string)changedProps["equipWeaponNAME"]);
-            }
-
-            if (changedProps.ContainsKey("dropWeaponNAME"))
-            {
-                //print("DROPPED WEAPON WITH ID: " + (int)changedProps["dropWeaponID"]);
-                DropWeapon((string)changedProps["dropWeaponNAME"],dropWeaponOffset);
-            }
-
-        }
-
-    }
-
 
     /*public override void OnDisconnected(DisconnectCause cause)
     {
@@ -226,12 +211,12 @@ public class WeaponController : MonoBehaviourPunCallbacks, IWeaponController
         Weapon tmpWeapon;
         var isWeapon = weapon.gameObject.TryGetComponent(out tmpWeapon);
         //print("Entered collider, isWeapon: "+ isWeapon);
-        if (isWeapon && PV.IsMine)
+        if (isWeapon)
         {
             // print("Entered collider weapon");
 
-            EquipWeapon(tmpWeapon.Data.name);
-            weapon.gameObject.GetComponent<PhotonView>().RPC("DestroyRpc", RpcTarget.All);
+            EquipWeapon(tmpWeapon);
+            //weapon.gameObject.GetComponent<PhotonView>().RPC("DestroyRpc", RpcTarget.All);
             // PhotonNetwork.Destroy(weapon.gameObject);
         }
     }
