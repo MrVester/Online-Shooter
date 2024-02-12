@@ -62,10 +62,9 @@ public class Weapon : MonoBehaviour,IWeapon
             //Disolve time = 10s
         }
     }
-    [PunRPC]
-    public void RPC_Destroy()
+    public void DestroyWeapon()
     {
-        Destroy(gameObject);
+        PhotonNetwork.Destroy(this.GetComponent<PhotonView>());
     }
 }
 

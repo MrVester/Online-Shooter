@@ -128,6 +128,7 @@ using Cinemachine;
         }
         void Die()
         {
+            _weaponController.equippedWeapon?.DestroyWeapon();
             playerManager.Die();
         }
         private void SetFlipVector()

@@ -25,7 +25,6 @@ public class WeaponController : MonoBehaviourPunCallbacks, IWeaponController
     private float cooldownTimestamp=0;
 
     private PhotonView PV;
-
     private void Awake()
     {
         _input = GetComponent<PlayerInput>();
@@ -51,6 +50,8 @@ public class WeaponController : MonoBehaviourPunCallbacks, IWeaponController
 
     bool TryShoot(IWeapon weapon)
     {
+        if (weapon == null)
+            return false;
         if (Time.time < cooldownTimestamp) return false;
         cooldownTimestamp = Time.time + (weapon.Data.shootingSpeed / 10);
         return true;
@@ -156,7 +157,21 @@ public class WeaponController : MonoBehaviourPunCallbacks, IWeaponController
         equippedWeapon = null;
         
     }
+    
 
+  /*  [PunRPC]
+    public void RPC_DestroyWeapon(int weaponid)
+    {
+        Weapon weapon;
+        Vector3 offsetCoords = transform.position + new Vector3(dropWeaponOffset.x * flipVector, dropWeaponOffset.y, 0);
+
+        if (equippedWeapon == null)
+            return;
+
+        PhotonView.Find(weaponid).TryGetComponent(out weapon);
+        weapon.transform.parent = null;
+        Destroy(weapon);
+    }*/
     /*public override void OnDisconnected(DisconnectCause cause)
     {
         base.OnDisconnected(cause);

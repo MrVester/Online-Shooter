@@ -18,7 +18,7 @@ public class WeaponSpawner : MonoBehaviour
     }
     void Start()
     {       
-      currentWeapon = SpawnRandomWeapon<Weapon>(new Vector3(spawnOffset.x, spawnOffset.y, 0) + transform.position);
+     // currentWeapon = SpawnRandomWeapon<Weapon>(new Vector3(spawnOffset.x, spawnOffset.y, 0) + transform.position);
     }
 
     private void Update()
