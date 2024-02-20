@@ -44,6 +44,8 @@ MonoBehaviour:
   - RPC_EquipWeapon
   - RPC_DropWeapon
   - RPC_Destroy
+  - RPC_DisableButton
+  - RPC_EnableButton
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

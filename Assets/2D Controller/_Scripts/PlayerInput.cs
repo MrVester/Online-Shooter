@@ -14,7 +14,7 @@ using UnityEngine.InputSystem;
 
 #if ENABLE_INPUT_SYSTEM
         private PlayerInputActions _actions;
-        private InputAction _move, _jump, _dash, _attack,_exampleAction, _look,_mousePos;
+        private InputAction _move, _jump, _dash, _attack,_equip, _look,_mousePos;
 
         private void Awake() {
             _actions = new PlayerInputActions();
@@ -24,7 +24,7 @@ using UnityEngine.InputSystem;
             _dash = _actions.Player.Dash;
             _attack = _actions.Player.Attack;
             _mousePos = _actions.Player.MousePosition;
-            _exampleAction = _actions.Player.ExampleAction;
+            _equip = _actions.Player.Equip;
           
         }
 
@@ -43,7 +43,7 @@ using UnityEngine.InputSystem;
                 Move = _move.ReadValue<Vector2>(),
                 Look = _look.ReadValue<Vector2>(),
                 MousePos = _mousePos.ReadValue<Vector2>(),
-                ExampleActionHeld = _exampleAction.IsPressed(),
+                Equip = _equip.IsPressed(),
                 //CurrentDevice = _look.activeControl.device.name,
 
             };
@@ -57,13 +57,13 @@ using UnityEngine.InputSystem;
                 DashDown = Input.GetKeyDown(KeyCode.X),
                 AttackDown = Input.GetKeyDown(KeyCode.Z),
                 Move = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")),
-                ExampleActionHeld = Input.GetKey(KeyCode.E),
+                Equip = Input.GetKey(KeyCode.E),
             };
         }
 #endif
-    }
+}
 
-    public struct FrameInput {
+public struct FrameInput {
         public Vector2 Move;
         public Vector2 Look;
         public Vector2 MousePos;
@@ -74,6 +74,6 @@ using UnityEngine.InputSystem;
         public bool AttackDown;
         public bool AttackHold;
         public bool AttackReleased;
-        public bool ExampleActionHeld;
+        public bool Equip;
    
     }

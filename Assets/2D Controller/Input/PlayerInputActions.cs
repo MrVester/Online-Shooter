@@ -64,7 +64,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""ExampleAction"",
+                    ""name"": ""Equip"",
                     ""type"": ""Button"",
                     ""id"": ""fac85392-9cd4-4c47-a8da-8911e5b74689"",
                     ""expectedControlType"": ""Button"",
@@ -319,7 +319,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""ExampleAction"",
+                    ""action"": ""Equip"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -428,7 +428,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Dash = m_Player.FindAction("Dash", throwIfNotFound: true);
         m_Player_Attack = m_Player.FindAction("Attack", throwIfNotFound: true);
-        m_Player_ExampleAction = m_Player.FindAction("ExampleAction", throwIfNotFound: true);
+        m_Player_Equip = m_Player.FindAction("Equip", throwIfNotFound: true);
         m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
         m_Player_MousePosition = m_Player.FindAction("MousePosition", throwIfNotFound: true);
     }
@@ -496,7 +496,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Dash;
     private readonly InputAction m_Player_Attack;
-    private readonly InputAction m_Player_ExampleAction;
+    private readonly InputAction m_Player_Equip;
     private readonly InputAction m_Player_Look;
     private readonly InputAction m_Player_MousePosition;
     public struct PlayerActions
@@ -507,7 +507,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
         public InputAction @Dash => m_Wrapper.m_Player_Dash;
         public InputAction @Attack => m_Wrapper.m_Player_Attack;
-        public InputAction @ExampleAction => m_Wrapper.m_Player_ExampleAction;
+        public InputAction @Equip => m_Wrapper.m_Player_Equip;
         public InputAction @Look => m_Wrapper.m_Player_Look;
         public InputAction @MousePosition => m_Wrapper.m_Player_MousePosition;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
@@ -531,9 +531,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Attack.started += instance.OnAttack;
             @Attack.performed += instance.OnAttack;
             @Attack.canceled += instance.OnAttack;
-            @ExampleAction.started += instance.OnExampleAction;
-            @ExampleAction.performed += instance.OnExampleAction;
-            @ExampleAction.canceled += instance.OnExampleAction;
+            @Equip.started += instance.OnEquip;
+            @Equip.performed += instance.OnEquip;
+            @Equip.canceled += instance.OnEquip;
             @Look.started += instance.OnLook;
             @Look.performed += instance.OnLook;
             @Look.canceled += instance.OnLook;
@@ -556,9 +556,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Attack.started -= instance.OnAttack;
             @Attack.performed -= instance.OnAttack;
             @Attack.canceled -= instance.OnAttack;
-            @ExampleAction.started -= instance.OnExampleAction;
-            @ExampleAction.performed -= instance.OnExampleAction;
-            @ExampleAction.canceled -= instance.OnExampleAction;
+            @Equip.started -= instance.OnEquip;
+            @Equip.performed -= instance.OnEquip;
+            @Equip.canceled -= instance.OnEquip;
             @Look.started -= instance.OnLook;
             @Look.performed -= instance.OnLook;
             @Look.canceled -= instance.OnLook;
@@ -633,7 +633,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         void OnJump(InputAction.CallbackContext context);
         void OnDash(InputAction.CallbackContext context);
         void OnAttack(InputAction.CallbackContext context);
-        void OnExampleAction(InputAction.CallbackContext context);
+        void OnEquip(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
         void OnMousePosition(InputAction.CallbackContext context);
     }

@@ -128,7 +128,7 @@ using Cinemachine;
         }
         void Die()
         {
-            _weaponController.equippedWeapon?.DestroyWeapon();
+            //_weaponController.equippedWeapon?.DestroyWeapon();
             playerManager.Die();
         }
         private void SetFlipVector()
@@ -155,8 +155,9 @@ using Cinemachine;
            }
            if (_attacks)
            {
+            if (_weaponController.equippedWeapon == null) return;
 
-            _weaponController.Shoot(_weaponController.equippedWeapon);
+            _weaponController.equippedWeapon.Shoot(_weaponController.equippedWeapon);
 
            }
               
@@ -727,7 +728,8 @@ using Cinemachine;
             if (_rb == null && !TryGetComponent(out _rb)) Debug.LogWarning("Ensure the GameObject with the Player Controller has a Rigidbody2D", this);
         }
 #endif
-    }
+    
+}
 
     public interface IPlayerController {
         /// <summary>
@@ -769,3 +771,4 @@ using Cinemachine;
         /// </summary>
         Decay
     }
+

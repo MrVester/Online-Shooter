@@ -42,7 +42,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "ExampleAction",
+                    "name": "Equip",
                     "type": "Button",
                     "id": "fac85392-9cd4-4c47-a8da-8911e5b74689",
                     "expectedControlType": "Button",
@@ -297,7 +297,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "ExampleAction",
+                    "action": "Equip",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

@@ -3,7 +3,8 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - SpawnPoint
   layers:
   - Default
   - TransparentFX
@@ -12,7 +13,7 @@ TagManager:
   - Water
   - UI
   - Player
-  - MainPlayer
+  - 
   - Ladder
   - Weapon
   - Climbable
@@ -38,6 +39,12 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: BackGround
+    uniqueID: 3416522889
+    locked: 0
+  - name: Back
+    uniqueID: 3229032789
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0

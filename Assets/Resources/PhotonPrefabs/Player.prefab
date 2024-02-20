@@ -289,7 +289,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponHolder: {fileID: 2443638623387435041}
   hand: {fileID: 2503360951994656052}
-  dropWeaponOffset: {x: 3, y: 2}
+  dropWeaponOffset: {x: 3, y: 0.5}
 --- !u!114 &-8068305993664734675
 MonoBehaviour:
   m_ObjectHideFlags: 0
