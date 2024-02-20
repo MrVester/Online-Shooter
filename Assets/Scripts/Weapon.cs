@@ -16,23 +16,26 @@ public class Weapon : MonoBehaviour,IWeapon
     public bool isDropped { get; private set; } = true;
    
     [field:SerializeField] public WeaponDataSO Data { get; private set; }
-    private CircleCollider2D weaponCollider;
+    public CircleCollider2D triggerCollider;
+    public CircleCollider2D physicalCollider;
      private Rigidbody2D _rb;
     private SpriteRenderer _spriteRenderer;
     private PhotonView PV;
     public event Action WeaponEquipped;
     private float cooldownTimestamp = 0;
-    public LayerMask raycastToShoot;
-
+    private LayerMask raycastToShoot;
+    public event Action bulletShot;
     private void Awake()
     {
         raycastToShoot = LayerMask.NameToLayer("Player");
         currentAmmo = Data.ammo;
          PV=GetComponent<PhotonView>();
+        
         _spriteRenderer=GetComponent<SpriteRenderer>();
         _spriteRenderer.sprite = Data.sprite;
         _spriteRenderer.sortingOrder = 1;
-        weaponCollider = GetComponent<CircleCollider2D>();
+        //weaponColliders = GetComponents<CircleCollider2D>();
+
         _rb = GetComponent<Rigidbody2D>();
     }
 
@@ -40,6 +43,7 @@ public class Weapon : MonoBehaviour,IWeapon
     {
        
     }
+    //ADD BULLET SYNC OVER CLIENTS
     bool TryShoot(IWeapon weapon)
     {
         if (Time.time < cooldownTimestamp) return false;
@@ -50,9 +54,15 @@ public class Weapon : MonoBehaviour,IWeapon
         }
         cooldownTimestamp = Time.time + (weapon.Data.shootingSpeed / 10);
         currentAmmo -= 1;
+        bulletShot?.Invoke();
         return true;
     }
+    //ADD BULLET SYNC OVER CLIENTS
+    [PunRPC]
+    public void RPC_ShootBullet()
+    {
 
+    }
     public void Shoot(IWeapon weapon)
     {
         Vector2 mouseScreenPosition = Camera.main.ScreenToWorldPoint(GetComponentInParent<PlayerController>().Look);
@@ -74,14 +84,17 @@ public class Weapon : MonoBehaviour,IWeapon
     public void Dropped()
     {
         isDropped = true;
-        weaponCollider.enabled = true;
+        
+         triggerCollider.enabled = true;
+         physicalCollider.enabled = true;
         _rb.simulated = true;
     }
     public void Equiped()
     {
         isDropped = false;
-        weaponCollider.enabled = false;
-         _rb.simulated = false;
+        triggerCollider.enabled = false;
+        physicalCollider.enabled = false;
+        _rb.simulated = false;
         WeaponEquipped?.Invoke();
     }
 

@@ -16,6 +16,7 @@ using Cinemachine;
         private CapsuleCollider2D _col; // current active collider
         private PlayerInput _input;
         private WeaponController _weaponController;
+        private UIController _uiController;
         private bool _cachedTriggerSetting;
 
         protected FrameInput FrameInput;
@@ -76,26 +77,32 @@ using Cinemachine;
         #endregion
 
         protected virtual void Awake() {
-           
+            
             maxHealth = _stats.maxHealth;
             currentHealth = maxHealth;
             PV = GetComponent<PhotonView>();
+            _uiController = GetComponent<UIController>();
+            _uiController.UISet += SetMaxHPUI;
             _weaponController = GetComponent<WeaponController>();
             _rb = GetComponent<Rigidbody2D>();
             _input = GetComponent<PlayerInput>();
             _cachedTriggerSetting = Physics2D.queriesHitTriggers;
             Physics2D.queriesStartInColliders = false;
-            
+              
             ToggleColliders(isStanding: true);
+        }
+        private void SetMaxHPUI()
+        {
+            _uiController.SetHealthUI(currentHealth);
         }
         private void Start()
         {
             playerManager = PhotonView.Find((int)PV.InstantiationData[0]).GetComponent<PlayerManager>();
+            
             if (!PV.IsMine)
             {
                 Destroy(GetComponentInChildren<CinemachineVirtualCamera>().gameObject);
                
-                //_rb.simulated = true;
             }
         }
         protected virtual void Update() {
@@ -121,10 +128,11 @@ using Cinemachine;
         currentHealth -= damage;
         if (currentHealth <= 0)
         {
+
             Die();
+            _uiController.SetNoWeaponUI();
         }
-            print("Took damage: "+ damage);
-            print("Health: "+ currentHealth);
+            _uiController.RefreshHealthUI(currentHealth);
         }
         void Die()
         {

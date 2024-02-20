@@ -15,10 +15,10 @@ MonoBehaviour:
   sprite: {fileID: 21300000, guid: 6fbfb5358099728459f200877034d468, type: 3}
   name: AK
   ammo: 30
-  damage: 10
+  damage: 15
   bulletsPerShot: 1
   spreadAngle: 15
-  shootingSpeed: 0.5
+  shootingSpeed: 1
   bulletSpeed: 2
   bulletRange: 20
   bulletSize: 2

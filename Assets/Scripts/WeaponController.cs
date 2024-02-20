@@ -21,6 +21,7 @@ public class WeaponController : MonoBehaviourPunCallbacks, IWeaponController
     public Vector2 dropWeaponOffset;
     private IPlayerController _player;
     private PlayerInput _input;
+     private UIController _uiController;
     private int flipVector;
     private string deviceName;
    
@@ -32,14 +33,20 @@ public class WeaponController : MonoBehaviourPunCallbacks, IWeaponController
     private PhotonView PV;
     private void Awake()
     {
+        PV = GetComponent<PhotonView>();
+        _uiController = GetComponent<UIController>();
         _input = GetComponent<PlayerInput>();
         _player = GetComponent<PlayerController>();
-        PV = GetComponent<PhotonView>();
+        
 
+    }
+    private void SetMaxAmmoUI()
+    {
+        _uiController.SetAmmoUI(equippedWeapon.currentAmmo);
     }
     private void Start()
     {
-
+        
     }
     private void Update()
     {
@@ -102,6 +109,7 @@ public class WeaponController : MonoBehaviourPunCallbacks, IWeaponController
     {
         if (equippedWeapon != null && PV.IsMine)
         {
+            equippedWeapon.bulletShot -= RefreshAmmoUI;
             DropWeapon(equippedWeapon, dropWeaponOffset);
         }
         Weapon weapon = PhotonView.Find(weaponid).GetComponent<Weapon>();
@@ -112,9 +120,20 @@ public class WeaponController : MonoBehaviourPunCallbacks, IWeaponController
         weapon.transform.position = weaponHolder.transform.position;
         weapon.transform.localRotation = Quaternion.Euler(Vector3.zero);
         weapon.transform.localScale = Vector3.one;
+        if (PV.IsMine)
+        {
+            RefreshAmmoUI();
+            equippedWeapon.bulletShot += RefreshAmmoUI;
+
+        }
+        
+        
         
     }
-
+    public void RefreshAmmoUI()
+    {
+        _uiController.RefreshAmmoUI(equippedWeapon.currentAmmo);
+    }
     public void DropWeapon(Weapon weapon,Vector2 dropWeaponOffset)
     {
         int id = weapon.GetComponent<PhotonView>().ViewID;

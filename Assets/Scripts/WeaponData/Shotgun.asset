@@ -15,10 +15,10 @@ MonoBehaviour:
   sprite: {fileID: 21300000, guid: 5f589bb274c5df54399c0c863430389a, type: 3}
   name: Shotgun
   ammo: 5
-  damage: 10
+  damage: 30
   bulletsPerShot: 5
   spreadAngle: 30
-  shootingSpeed: 0.5
-  bulletSpeed: 2
+  shootingSpeed: 5
+  bulletSpeed: 5
   bulletRange: 10
   bulletSize: 2

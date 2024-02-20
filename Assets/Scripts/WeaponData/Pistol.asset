@@ -15,10 +15,10 @@ MonoBehaviour:
   sprite: {fileID: 21300000, guid: cf868433bcc5cdf4ea913d5760b398ad, type: 3}
   name: Pistol
   ammo: 12
-  damage: 2
+  damage: 20
   bulletsPerShot: 1
   spreadAngle: 5
-  shootingSpeed: 2
+  shootingSpeed: 10
   bulletSpeed: 5
   bulletRange: 20
   bulletSize: 5

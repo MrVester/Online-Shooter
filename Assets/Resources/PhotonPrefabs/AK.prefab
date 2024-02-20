@@ -51,9 +51,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <Data>k__BackingField: {fileID: 11400000, guid: 3cbb242d5e0042a49b1fd6bf65fc2b21, type: 2}
-  raycastToShoot:
-    serializedVersion: 2
-    m_Bits: 0
+  triggerCollider: {fileID: 7562842069730707178}
+  physicalCollider: {fileID: -7009581876720489375}
 --- !u!58 &7562842069730707178
 CircleCollider2D:
   m_ObjectHideFlags: 0
