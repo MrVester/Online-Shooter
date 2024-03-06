@@ -47,6 +47,9 @@ MonoBehaviour:
   - RPC_DisableButton
   - RPC_EnableButton
   - RPC_ShootBullet
+  - RPC_ShotParticles
+  - RPC_DamageParticles
+  - RPC_DeathParticles
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

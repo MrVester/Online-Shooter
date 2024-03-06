@@ -1,5 +1,6 @@
 using Photon.Pun;
 using Photon.Realtime;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net.NetworkInformation;
@@ -10,6 +11,7 @@ public class PlayerAnimator : MonoBehaviourPunCallbacks
 {
     private SpriteRenderer _renderer;
     private IPlayerController _player;
+    public ParticleSystem damageParticles;
     //private int flipVector;
     private PhotonView PV;
     // Start is called before the first frame update
@@ -18,6 +20,7 @@ public class PlayerAnimator : MonoBehaviourPunCallbacks
         PV= GetComponent<PhotonView>();
         _player = GetComponent<IPlayerController>();
         _renderer = GetComponent<SpriteRenderer>();
+        _player.OnDamage += DamageParticles;
     }
 
     // Update is called once per frame
@@ -29,8 +32,18 @@ public class PlayerAnimator : MonoBehaviourPunCallbacks
         }
         
     }
+    private void DamageParticles()
+    {
+        PV.RPC("RPC_DamageParticles", RpcTarget.All);
+    }
+    [PunRPC]
+    private void RPC_DamageParticles()
+    {
+        damageParticles.Play();
+    }
+   
 
-    private void HandleSpriteFlipping(float flipVector)
+private void HandleSpriteFlipping(float flipVector)
     {
         bool switched = Mathf.Abs(flipVector) > 0.1f;
         if (switched)

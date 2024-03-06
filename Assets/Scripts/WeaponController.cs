@@ -6,6 +6,8 @@ using Photon.Pun;
 using Photon.Realtime;
 using System.IO;
 using UnityEngine.UI;
+using UnityEngine.UIElements.Experimental;
+using System.Linq;
 
 
 
@@ -24,7 +26,8 @@ public class WeaponController : MonoBehaviourPunCallbacks, IWeaponController
      private UIController _uiController;
     private int flipVector;
     private string deviceName;
-   
+
+    private List<Weapon> closestWeapons=new List<Weapon>();
 
     private bool isAttacked;
 
@@ -60,6 +63,7 @@ public class WeaponController : MonoBehaviourPunCallbacks, IWeaponController
 
         HandRotation();
         FlipHand();
+        PickUpWeapon();
     }
     
  
@@ -98,9 +102,19 @@ public class WeaponController : MonoBehaviourPunCallbacks, IWeaponController
             hand.transform.localPosition = new Vector3(pos.x * -1, pos.y, pos.z);
     }
 
+    public void PickUpWeapon()
+    {
+       
+        if (_input.FrameInput.Equip&&closestWeapons.Count!=0)
+        {
 
+            EquipWeapon(closestWeapons[0]);
+
+        }
+    }
     public void EquipWeapon(Weapon weapon)
     {
+
         int id = weapon.GetComponent<PhotonView>().ViewID;
         PV.RPC("RPC_EquipWeapon", RpcTarget.All, id);
     }
@@ -109,7 +123,7 @@ public class WeaponController : MonoBehaviourPunCallbacks, IWeaponController
     {
         if (equippedWeapon != null && PV.IsMine)
         {
-            equippedWeapon.bulletShot -= RefreshAmmoUI;
+            equippedWeapon.BulletShot -= RefreshAmmoUI;
             DropWeapon(equippedWeapon, dropWeaponOffset);
         }
         Weapon weapon = PhotonView.Find(weaponid).GetComponent<Weapon>();
@@ -123,12 +137,8 @@ public class WeaponController : MonoBehaviourPunCallbacks, IWeaponController
         if (PV.IsMine)
         {
             RefreshAmmoUI();
-            equippedWeapon.bulletShot += RefreshAmmoUI;
-
-        }
-        
-        
-        
+            equippedWeapon.BulletShot += RefreshAmmoUI;
+        }    
     }
     public void RefreshAmmoUI()
     {
@@ -162,27 +172,43 @@ public class WeaponController : MonoBehaviourPunCallbacks, IWeaponController
     }
 
 
-  
+
     /*public override void OnDisconnected(DisconnectCause cause)
     {
         base.OnDisconnected(cause);
         Debug.LogWarning($"Player disconnected: {cause}");
     }*/
 
-   
-    public void OnTriggerStay2D(Collider2D weapon)
+
+    /*  private void OnTriggerStay2D(Collider2D weapon)
+      {
+          Weapon tmpWeapon;
+          if (weapon.TryGetComponent(out tmpWeapon))
+          {
+              EquipWeapon(tmpWeapon);
+          }
+      }*/
+    public void OnTriggerEnter2D(Collider2D weapon)
     {
-
         Weapon tmpWeapon;
-        var isWeapon = weapon.gameObject.TryGetComponent(out tmpWeapon);
-        if (isWeapon&&_input.FrameInput.Equip)
+        if (weapon.TryGetComponent(out tmpWeapon))
         {
-
-            EquipWeapon(tmpWeapon);
-
+            if(!closestWeapons.Contains(tmpWeapon))
+            closestWeapons.Add(tmpWeapon);
         }
     }
-    
+    public void OnTriggerExit2D(Collider2D weapon)
+    {
+        Weapon tmpWeapon;
+        if (weapon.TryGetComponent(out tmpWeapon))
+        {
+            if (closestWeapons.Contains(tmpWeapon))
+                closestWeapons.Remove(tmpWeapon);
+        }
+
+    }
+
+
 }
 public interface IWeaponController
 {   public Weapon equippedWeapon { get; set; }

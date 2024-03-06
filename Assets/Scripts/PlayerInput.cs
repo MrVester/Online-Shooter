@@ -14,7 +14,7 @@ using UnityEngine.InputSystem;
 
 #if ENABLE_INPUT_SYSTEM
         private PlayerInputActions _actions;
-        private InputAction _move, _jump, _dash, _attack,_equip, _look,_mousePos;
+        private InputAction _move, _jump, _dash, _attack,_equip, _look,_mousePos,_menu;
 
         private void Awake() {
             _actions = new PlayerInputActions();
@@ -25,7 +25,7 @@ using UnityEngine.InputSystem;
             _attack = _actions.Player.Attack;
             _mousePos = _actions.Player.MousePosition;
             _equip = _actions.Player.Equip;
-          
+            _menu = _actions.Player.Menu;
         }
 
         private void OnEnable() => _actions.Enable();
@@ -43,7 +43,9 @@ using UnityEngine.InputSystem;
                 Move = _move.ReadValue<Vector2>(),
                 Look = _look.ReadValue<Vector2>(),
                 MousePos = _mousePos.ReadValue<Vector2>(),
-                Equip = _equip.IsPressed(),
+                Equip = _equip.WasPressedThisFrame(),
+                Menu=_menu.WasPressedThisFrame(),
+
                 //CurrentDevice = _look.activeControl.device.name,
 
             };
@@ -75,5 +77,6 @@ public struct FrameInput {
         public bool AttackHold;
         public bool AttackReleased;
         public bool Equip;
+        public bool Menu;
    
     }

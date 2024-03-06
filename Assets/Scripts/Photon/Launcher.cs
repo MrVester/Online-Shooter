@@ -34,6 +34,7 @@ public class Launcher : MonoBehaviourPunCallbacks
     {
 
         PhotonNetwork.LoadLevel(gameSceneIndex);
+  
     }
     public override void OnConnectedToMaster()
     {

@@ -41,6 +41,8 @@ using Cinemachine;
         public event Action<bool> Jumped;
         public event Action AirJumped;
         public event Action Attacked;
+        public event Action OnDamage;
+        public event Action<Vector2> OnDeath;
         public ScriptableStats PlayerStats => _stats;
         public int FlipVector => _flipVector;
         public Vector2 Input => FrameInput.Move;
@@ -126,6 +128,7 @@ using Cinemachine;
             return;
 
         currentHealth -= damage;
+        OnDamage?.Invoke();
         if (currentHealth <= 0)
         {
 
@@ -137,6 +140,7 @@ using Cinemachine;
         void Die()
         {
             //_weaponController.equippedWeapon?.DestroyWeapon();
+            OnDeath?.Invoke((Vector2)transform.position);
             playerManager.Die();
         }
         private void SetFlipVector()
@@ -751,6 +755,8 @@ using Cinemachine;
         public event Action<bool> Jumped; // Is wall jump
         public event Action AirJumped;
         public event Action Attacked;
+        public event Action OnDamage;
+        public event Action<Vector2> OnDeath;
 
         public ScriptableStats PlayerStats { get; }
         public int FlipVector { get; }
